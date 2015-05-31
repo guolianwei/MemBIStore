@@ -15,7 +15,7 @@ public interface IDataSegment {
 	 * 每个记录的字节长度
 	 * @return
 	 */
-	public int rlength();
+	public int rLength();
     /**
      *包含的行个数
      * @return
@@ -31,7 +31,7 @@ public interface IDataSegment {
      * @param record
      * @return
      */
-    public boolean putRecord(byte[] record);
+    public boolean append(byte[] record);
     
     /**
      * 迭代取出所有记录

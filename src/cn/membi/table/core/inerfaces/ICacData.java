@@ -9,7 +9,7 @@ import java.util.Iterator;
  *
  */
 public interface ICacData {
-	public IDataSegment[] blocks();
+	public IDataSegment[] segments();
 
 	/**
 	 * 获得该数据块在表中的起始行号

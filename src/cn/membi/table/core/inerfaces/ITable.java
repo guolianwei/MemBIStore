@@ -1,8 +1,25 @@
 package cn.membi.table.core.inerfaces;
 
 import java.util.Iterator;
+
+/**
+ * 内存表接口
+ * 
+ * @author guolw
+ *
+ */
 public interface ITable {
-   public void addRecord(IRecord record);
-   public Iterator<IRecord> iterator();
-   public IColumn[] getColumns();
+	/**
+	 * 追加记录
+	 * 
+	 * @param record
+	 */
+	public void append(IRowRecords colRecords);
+
+	public Iterator<IRowRecords> iterator();
+
+	public IColumn[] getColumns();
+
+	public void addColumn(IColumn column);		
+	
 }

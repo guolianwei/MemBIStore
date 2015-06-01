@@ -13,7 +13,7 @@ public interface IColumn {
      * @param i
      * @return
      */
-    public byte[] record(int i);
+    public IColRecord record(int i);
     
     /**
      * 参与计算的数据
@@ -31,7 +31,7 @@ public interface IColumn {
      * 获得当前列的迭代器值
      * @return
      */
-    public Iterator<byte[]> iterator();
+    public Iterator<IColRecord> iterator();
     
     /**
      * 追加字符串到列数据存储中
@@ -48,10 +48,6 @@ public interface IColumn {
      */
     public boolean appendNumber(byte[] number);
     
-    /**
-     * 列在表格中的数组下标
-     * @return
-     */
-    public int cIndex();
+    
     
 }

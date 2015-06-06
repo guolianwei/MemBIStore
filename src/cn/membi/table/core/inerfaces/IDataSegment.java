@@ -27,7 +27,7 @@ public interface IDataSegment {
     /**
      * 初始化当前段
      * @param rLength 段中单条记录的字节长度
-     * @param rowCount 当前段所包含的记录的字节长度。
+     * @param rowCount 当前段所包含的记录数。
      * @return
      */
     public boolean init(int colRecLength,int rowCount);
@@ -50,5 +50,5 @@ public interface IDataSegment {
      * 迭代取出所有记录
      * @return
      */
-    public Iterator<byte[]> iterator();
+    public Iterator<IColRecord> iterator();
 }

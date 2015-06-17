@@ -14,7 +14,7 @@ public interface IColRecord {
 	 * @return
 	 */
 	public byte[] bytesValue();
-	
+
 	/**
 	 * 一行记录中某一列数据的整形值
 	 * 
@@ -22,4 +22,12 @@ public interface IColRecord {
 	 * @return
 	 */
 	public int intValue();
+
+	/**
+	 * 一行记录中某一列数据的整形值
+	 * 
+	 * @param colIndex
+	 * @return
+	 */
+	public short shortValue();
 }

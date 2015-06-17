@@ -44,6 +44,13 @@ public class ByteUtil {
 		return bytes;
 	}
 
+	// 整数到字节数组的转换
+	public static byte[] shorToByte(short number) {
+		byte[] bytes = new byte[2];
+		ByteBuffer.wrap(bytes).putShort(number);
+		return bytes;
+	}
+
 	// 字节数组到整数的转换
 	public static int byteToInt(byte[] b, int offset, int length) {
 		return ByteBuffer.wrap(b, offset, length).getInt();
@@ -52,6 +59,11 @@ public class ByteUtil {
 	// 字节数组到整数的转换
 	public static int byteToInt(byte[] b) {
 		return ByteBuffer.wrap(b).getInt();
+	}
+
+	// 字节数组到短整形的转换
+	public static short byteToShort(byte[] b) {
+		return ByteBuffer.wrap(b).getShort();
 	}
 
 	// 长整数到字节数组的转换

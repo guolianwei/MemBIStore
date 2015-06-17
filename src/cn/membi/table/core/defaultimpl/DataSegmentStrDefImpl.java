@@ -1,5 +1,6 @@
 package cn.membi.table.core.defaultimpl;
 
+import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import cn.membi.table.core.inerfaces.IColRecord;
@@ -15,8 +16,28 @@ import cn.membi.table.core.util.ByteUtil;
  * */
 public class DataSegmentStrDefImpl implements IDataSegment {
 	private int colRecLength = -1;
-	private int rowCount = -1;
+	/**
+	 * 数据段的定义数据行数，所包含函数不能超过该值
+	 */
+	private int defRowCount = -1;
 	private byte[] data = null;
+	private boolean zip = true;
+
+	/**
+	 * 是否安列压缩，默认true
+	 * 
+	 * @param zip
+	 *            是否按列压缩，默认true
+	 */
+	public DataSegmentStrDefImpl(boolean zip) {
+		super();
+		this.zip = zip;
+	}
+
+	/**
+	 * 当前包含的数据行数
+	 */
+	private int rowCount;
 	/**
 	 * 如果新增，则新增字节的在数据中的起始索引
 	 * */
@@ -27,19 +48,19 @@ public class DataSegmentStrDefImpl implements IDataSegment {
 		return colRecLength;
 	}
 
-	@Override
-	public int rowCount() {
-		return rowCount;
+	public int defRowCount() {
+		return defRowCount;
 	}
 
 	/**
+	 * 
 	 * @see cn.membi.table.core.inerfaces.IDataSegment#init(int, int)
 	 */
 	@Override
-	public boolean init(int colRecLength, int rowCount) {
+	public boolean init(int colRecLength, int defRowCount) {
 		this.colRecLength = colRecLength;
-		this.rowCount = rowCount;
-		data = new byte[this.colRecLength * rowCount];
+		this.defRowCount = defRowCount;
+		data = new byte[this.colRecLength * defRowCount];
 		return true;
 	}
 
@@ -48,10 +69,59 @@ public class DataSegmentStrDefImpl implements IDataSegment {
 		return false;
 	}
 
+	int valueCurrent = -1;
+
 	@Override
-	public boolean append(byte[] record) {
-		System.arraycopy(record, 0, data, curValueByteIndex, colRecLength);
+	public boolean append(byte record) {
+		if (rowCount >= this.defRowCount) {
+			return false;
+		}
+		data[curValueByteIndex] = record;
 		curValueByteIndex += colRecLength;
+		valueCurrent = (int) record;
+		rowCount++;
+		return true;
+	}
+
+	@Override
+	public boolean append(short record) {
+		if (rowCount >= this.defRowCount) {
+			return false;
+		}
+		byte[] bytes = ByteUtil.shorToByte(record);
+		System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
+		curValueByteIndex += colRecLength;
+		rowCount++;
+		return true;
+	}
+
+	private boolean zipCaculate(int record) {
+		// 如果已保存值和当前需要增加的值相等。
+		if (record == valueCurrent) {
+			// 如果当前已累计超过2个值相等。
+			int cuV = ByteBuffer.wrap(data, curValueByteIndex, colRecLength)
+					.getInt();
+			if (cuV < 0) {
+				cuV = cuV - 1;
+			}
+
+			return false;
+		} else {
+			valueCurrent = record;
+
+			return true;
+		}
+	}
+
+	@Override
+	public boolean append(int record) {
+		if (rowCount >= this.defRowCount) {
+			return false;
+		}
+		byte[] bytes = ByteUtil.intToByte(record);
+		System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
+		curValueByteIndex += colRecLength;
+		rowCount++;
 		return true;
 	}
 
@@ -93,6 +163,10 @@ public class DataSegmentStrDefImpl implements IDataSegment {
 		public void remove() {
 
 		}
+	}
 
+	@Override
+	public int rowCount() {
+		return this.rowCount;
 	}
 }

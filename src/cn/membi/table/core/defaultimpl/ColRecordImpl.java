@@ -5,13 +5,13 @@ import cn.membi.table.core.util.ByteUtil;
 
 public class ColRecordImpl implements IColRecord {
 	byte[] bytesValue;
-	public ColRecordImpl(byte[] bytesValue_){
-		bytesValue=bytesValue_;
+
+	public ColRecordImpl(byte[] bytesValue_) {
+		bytesValue = bytesValue_;
 	}
-	
+
 	@Override
 	public byte[] bytesValue() {
-		// TODO Auto-generated method stub
 		return bytesValue;
 	}
 
@@ -20,4 +20,8 @@ public class ColRecordImpl implements IColRecord {
 		return ByteUtil.byteToInt(bytesValue);
 	}
 
+	@Override
+	public short shortValue() {
+		return ByteUtil.byteToShort(bytesValue);
+	}
 }

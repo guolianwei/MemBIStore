@@ -4,7 +4,8 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import cn.membi.table.core.inerfaces.IColRecord;
-import cn.membi.table.core.inerfaces.IDataSegment;
+import cn.membi.table.core.inerfaces.datasegment.IDataSegment;
+import cn.membi.table.core.inerfaces.datasegment.IStrColShortDataSegment;
 import cn.membi.table.core.util.ByteUtil;
 
 /**
@@ -14,7 +15,13 @@ import cn.membi.table.core.util.ByteUtil;
  * 则表示当前记录位的上一位的值向下延伸3个记录。<br>
  * 3.在迭代时自动返回当前记录位的实际字节值。<br>
  * */
-public class DataSegmentStrDefImpl implements IDataSegment {
+public class DataSegmentStrDefImpl implements IStrColShortDataSegment {
+	public static final int[] lens = new int[4];
+	static {
+		lens[1] = Byte.MIN_VALUE;
+		lens[2] = Short.MIN_VALUE;
+		lens[4] = Integer.MIN_VALUE;
+	}
 	private int colRecLength = -1;
 	/**
 	 * 数据段的定义数据行数，所包含函数不能超过该值
@@ -54,7 +61,7 @@ public class DataSegmentStrDefImpl implements IDataSegment {
 
 	/**
 	 * 
-	 * @see cn.membi.table.core.inerfaces.IDataSegment#init(int, int)
+	 * @see cn.membi.table.core.inerfaces.datasegment.IDataSegment#init(int, int)
 	 */
 	@Override
 	public boolean init(int colRecLength, int defRowCount) {
@@ -64,65 +71,86 @@ public class DataSegmentStrDefImpl implements IDataSegment {
 		return true;
 	}
 
-	@Override
-	public boolean growth(int colRecLength) {
-		return false;
-	}
-
 	int valueCurrent = -1;
 
 	@Override
 	public boolean append(byte record) {
+		if (checkBoundary()) {
+			data[curValueByteIndex] = record;
+			curValueByteIndex += colRecLength;
+			valueCurrent = (int) record;
+			rowCount++;
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private boolean checkBoundary() {
 		if (rowCount >= this.defRowCount) {
 			return false;
 		}
-		data[curValueByteIndex] = record;
-		curValueByteIndex += colRecLength;
-		valueCurrent = (int) record;
-		rowCount++;
 		return true;
 	}
 
 	@Override
 	public boolean append(short record) {
-		if (rowCount >= this.defRowCount) {
-			return false;
+		if (checkBoundary()) {
+			if (zip(record)) {
+				return true;
+			}
+			byte[] bytes = ByteUtil.shorToByte(record);
+			System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
+			curValueByteIndex += colRecLength;
+			rowCount++;
+			return true;
 		}
-		byte[] bytes = ByteUtil.shorToByte(record);
-		System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
-		curValueByteIndex += colRecLength;
-		rowCount++;
-		return true;
+		return false;
 	}
 
+	private boolean zip(short record) {
+		if (this.zip && zipCaculate(record)) {
+			// 将当前的压缩值写入当前位置
+			byte[] bytes = ByteUtil.shorToByte((short) cuZipV);
+			System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
+			rowCount++;
+			return true;
+		}
+		return false;
+	}
+
+	private int cuZipV = 0;
+
+	/**
+	 * 目前的压缩条件符合返回true。
+	 * 
+	 * @param record
+	 * @return
+	 */
 	private boolean zipCaculate(int record) {
 		// 如果已保存值和当前需要增加的值相等。
-		if (record == valueCurrent) {
-			// 如果当前已累计超过2个值相等。
-			int cuV = ByteBuffer.wrap(data, curValueByteIndex, colRecLength)
+		if (record == valueCurrent && cuZipV > lens[colRecLength]) {
+			cuZipV = ByteBuffer.wrap(data, curValueByteIndex, colRecLength)
 					.getInt();
-			if (cuV < 0) {
-				cuV = cuV - 1;
-			}
-
-			return false;
+			cuZipV = cuZipV - 1;
+			return true;
 		} else {
 			valueCurrent = record;
-
-			return true;
+			cuZipV = 0;
+			return false;
 		}
 	}
 
 	@Override
 	public boolean append(int record) {
-		if (rowCount >= this.defRowCount) {
-			return false;
+		if (this.checkBoundary()) {
+			byte[] bytes = ByteUtil.intToByte(record);
+			System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
+			curValueByteIndex += colRecLength;
+			rowCount++;
+			return true;
 		}
-		byte[] bytes = ByteUtil.intToByte(record);
-		System.arraycopy(bytes, 0, data, curValueByteIndex, colRecLength);
-		curValueByteIndex += colRecLength;
-		rowCount++;
-		return true;
+		return false;
 	}
 
 	@Override

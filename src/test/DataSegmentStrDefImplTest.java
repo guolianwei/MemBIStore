@@ -12,7 +12,7 @@ import org.junit.Test;
 import cn.membi.table.core.defaultimpl.ColRecordImpl;
 import cn.membi.table.core.defaultimpl.DataSegmentStrDefImpl;
 import cn.membi.table.core.inerfaces.IColRecord;
-import cn.membi.table.core.inerfaces.IDataSegment;
+import cn.membi.table.core.inerfaces.datasegment.IDataSegment;
 import cn.membi.table.core.util.ByteUtil;
 
 /**

@@ -2,6 +2,8 @@ package cn.membi.table.core.inerfaces;
 
 import java.util.Iterator;
 
+import cn.membi.table.core.inerfaces.datasegment.IDataSegment;
+
 /**
  * 参与统计的数据
  * 

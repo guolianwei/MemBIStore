@@ -1,6 +1,8 @@
-package cn.membi.table.core.inerfaces;
+package cn.membi.table.core.inerfaces.datasegment;
 
 import java.util.Iterator;
+
+import cn.membi.table.core.inerfaces.IColRecord;
 
 /**
  * 数据段<br>
@@ -39,39 +41,7 @@ public interface IDataSegment {
 	 */
 	public boolean init(int colRecLength, int rowCount);
 
-	/**
-	 * 将当前段的单个记录字节长度增加
-	 * 
-	 * @param colRecLength
-	 *            增加后的单个列记录的字节长度
-	 * @return
-	 */
-	public boolean growth(int colRecLength);
-
-	/**
-	 * 将记录的字节形式数据写入该段中
-	 * 
-	 * @param record
-	 * @return
-	 */
-	public boolean append(byte record);
-
-	/**
-	 * 将记录的字节形式数据写入该段中
-	 * 
-	 * @param record
-	 * @return
-	 */
-	public boolean append(short record);
-
-	/**
-	 * 将记录的字节形式数据写入该段中
-	 * 
-	 * @param record
-	 * @return
-	 */
-	public boolean append(int record);
-
+	
 	/**
 	 * 迭代取出所有记录
 	 * 

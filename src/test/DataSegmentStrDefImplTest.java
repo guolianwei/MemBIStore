@@ -10,7 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import cn.membi.table.core.defaultimpl.ColRecordImpl;
-import cn.membi.table.core.defaultimpl.DataSegmentStrDefImpl;
+import cn.membi.table.core.defaultimpl.datasegment.ShortDataSegmentStrDefImpl;
 import cn.membi.table.core.inerfaces.IColRecord;
 import cn.membi.table.core.inerfaces.datasegment.IDataSegment;
 import cn.membi.table.core.util.ByteUtil;
@@ -47,11 +47,11 @@ public class DataSegmentStrDefImplTest {
 
 	@Test
 	public void test() {
-		IDataSegment dsd = new DataSegmentStrDefImpl(true);
+		ShortDataSegmentStrDefImpl dsd = new ShortDataSegmentStrDefImpl(true);
 		dsd.init(4, testdata.length);
 		for (int i = 0; i < testdata.length; i++) {
 			byte[] bv = ByteUtil.intToByte(testdata[i]);
-			dsd.append(i);
+			dsd.append((short) i);
 		}
 		// 第j个值取出后应当是i
 		Iterator<IColRecord> iter = dsd.iterator();
